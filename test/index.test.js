@@ -1,14 +1,20 @@
 const assert = require('assert');
 const feathers = require('@feathersjs/feathers');
+const path = require('path');
 const { join } = require('path');
 
 const plugin = require('../lib');
 
 describe('@feathersjs/configuration', () => {
-  const app = feathers().configure(plugin());
+  // if process.env[<env>] do not exist in  .env
+  const app = feathers().configure(plugin({path: path.join(__dirname, '.env.test')}));
 
   it('exports default', () =>
     assert.equal(plugin, plugin.default)
+  );
+
+  it('initialized .env values', () =>
+    assert.ok(process.env['TEST_VALUE'] === 'ok')
   );
 
   it('initialized app with default data', () =>
@@ -52,7 +58,7 @@ describe('@feathersjs/configuration', () => {
   );
 
   it('works when called directly', () => {
-    const fn = plugin();
+    const fn = plugin({path: path.join(__dirname, '.env.test')});
 
     assert.equal(fn().port, '3030');
   });
